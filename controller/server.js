@@ -1,9 +1,28 @@
 const express = require('express');
 const path = require('path');
 const alimentosModel = require('../model/alimentosModel');
+const promClient = require('prom-client');
 
 const app = express();
 const port = process.env.PORT || 3000;
+
+const register = new promClient.Registry();
+promClient.collectDefaultMetrics({ register });
+
+const httpRequestDuration = new promClient.Histogram({
+  name: 'http_request_duration_seconds',
+  help: 'Duration of HTTP requests in seconds',
+  labelNames: ['method', 'route', 'status'],
+  registers: [register]
+});
+
+app.use((req, res, next) => {
+  const end = httpRequestDuration.startTimer();
+  res.on('finish', () => {
+    end({ method: req.method, route: req.path, status: res.statusCode });
+  });
+  next();
+});
 
 app.use(express.static(path.join(__dirname, '..', 'view')));
 app.use('/fotos', express.static(path.join(__dirname, '..', 'fotos')));
@@ -90,6 +109,11 @@ app.get('/foto/:alimento', (req, res) => {
 
 app.get('/health', (req, res) => {
   res.status(200).json({ status: 'ok' });
+});
+
+app.get('/metrics', async (req, res) => {
+  res.set('Content-Type', register.contentType);
+  res.end(await register.metrics());
 });
 
 app.listen(port, () => {
