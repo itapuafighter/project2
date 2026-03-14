@@ -1,0 +1,95 @@
+/* cambiar el color de fondo a tonos verdes */
+body {
+  background-color: #f1e761; /* un tono de verde */
+  margin-left: 6cm;
+  margin-right: 6cm;
+}
+
+/* cambiar la fuente y el tamaño de letra */
+body {
+  font-family: "Anton", sans-serif; /* cambiar la fuente a Anton */
+  font-size: 20px; /* aumentar el tamaño de la letra */
+}
+
+/* reducir el tamaño de los espacios para introducir información */
+input[type="number"],
+input[type="text"],
+select {
+  width: 200px; /* reducir el ancho de los inputs y selects */
+  padding: 8px; /* añadir un poco de relleno para mejorar la apariencia */
+  border: 1px solid black;
+  border-radius: 5px;
+  font-size: 1rem;
+  background-color: #f0bd5e; /* color de fondo naranja */
+}
+
+label {
+  font-weight: bold; /* hacer que las etiquetas sean más llamativas */
+  margin-bottom: 5px; /* reducir el espacio entre las etiquetas */
+  color: black; /* color de texto blanco */
+}
+
+option {
+  background-color: #f0bd5e; /* color de fondo naranja */
+  border: black;
+  color: black; /* color de texto negro */
+}
+
+/* cambiar la fuente de los desplegables */
+select {
+  font-family: "Bebas Neue", sans-serif; /* cambiar la fuente a Bebas Neue */
+  padding: 0.5rem;
+  border: 1px solid black;
+  border-radius: 5px;
+  font-size: 1rem;
+  background-color: #f0bd5e; /* color de fondo naranja */
+}
+
+/* cambiar la fuente de los datos mostrados en pantalla */
+#resultadosDiv,
+#consumoTotalDiv {
+  font-family: "Courier", monospace; /* cambiar la fuente a Courier */
+}
+
+/* estilos para la página principal */
+
+/* clases para ajustar el tamaño de las imágenes y los iconos */
+.imagen-grande {
+  width: 5cm; /* tamaño de imagen grande */
+  height: auto; /* altura automática */
+  border: 2px solid black; /* borde negro de 2px */
+}
+
+.icono-pequeno {
+  width: 1.5cm; /* tamaño de icono pequeño */
+  height: auto; /* altura automática */
+}
+
+/* estilos para el botón 'Agregar alimento' */
+.boton-agregar,
+.boton-calcular,
+.boton-eliminar {
+  font-family: "Anton", sans-serif; /* cambiar la fuente a Anton */
+  background-color: #dbb11a; /* color de fondo */
+  color: black; /* texto blanco */
+  padding: 10px 20px; /* añadir espacio alrededor del texto */
+  border: 1px solid black;
+  border-radius: 5px; /* esquinas redondeadas */
+  cursor: pointer; /* cambiar el cursor al pasar por encima */
+  font-size: 16px; /* tamaño de fuente */
+}
+
+/* estilo para los div */
+div {
+  margin-bottom: 10px; /* separación entre los grupos de elementos */
+}
+
+/* estilo para los inputs */
+input {
+  padding: 0.5rem; /* añadir un espacio interno alrededor del contenido */
+  border: 1px solid black; /* definir un borde */
+  border-radius: 5px; /* redondear las esquinas */
+  font-size: 1rem; /* tamaño de fuente */
+  width: 5cm; /* ancho de los inputs */
+  background-color: #f0bd5e; /* color de fondo */
+}

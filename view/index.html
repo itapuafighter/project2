@@ -1,0 +1,359 @@
+
+<!--seguimos un modelo MVC (model view controller) por lo que tenemos el código dividido en 3 carpetas (model, view y controller) en la carpeta de view tenemos nuestro front, dentro tenemos el html y el css -->
+
+
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <!-- aquí van los metadatos -->
+  <meta charset="UTF-8"> <!-- codificación de caracteres -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
+  <title>GUÍA NUTRICIONAL</title> <!-- título de la página -->
+  <!-- aquí van los enlaces a fuentes externas, enlazamos con google fonts de donde hemos sacado varias fuentes y a nuestro css -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Alfa+Slab+One&family=Amatic+SC:wght@400;700&family=Anton&family=Bebas+Neue&family=Courier+Prime:ital,wght@0,400;0,700;1,400;1,700&family=Jersey+10+Charted&family=Orbitron:wght@400..900&family=Righteous&family=Russo+One&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css"> 
+</head>
+<body>
+  <!-- el título principal -->
+  <h1>GUÍA NUTRICIONAL</h1>
+  
+  <!-- desde este div seleccionamos los alimentos -->
+  <div>
+    <label for="alimentosSelect">seleccione un alimento:</label>
+    <select id="alimentosSelect">
+      <!-- el desplegable -->
+    </select>
+  </div>
+  
+  <!-- aquí ingresamos los gramos, lo tenemos en un div para poder darle un estilo desde css -->
+  <div>
+    <label for="gramosInput">ingrese la cantidad de gramos:</label>
+    <input type="number" id="gramosInput">
+  </div>
+  
+  <!-- este es botón para agregar alimento, le hemos asignado una clase para poder darse estilo en el css  -->
+  <div>
+    <button class="boton-agregar" onclick="agregarAlimento()">agregar alimento</button>
+  </div>
+  
+  <!-- div de los resultados de la elección de alimentos -->
+  <div id="resultadosDiv"></div>
+
+  <!-- este es formulario para ingresar los datos del usuario, el usuario debe escribir su edad por pantalla y va al input -->
+  <div>
+    <h2>datos del usuario</h2>
+    <label for="edadInput">edad:</label>
+    <input type="number" id="edadInput" min="0">
+  </div>
+  
+  <!-- aquí escribe su peso por pantalla y va al input -->
+  <div>
+    <label for="pesoInput">peso (kg):</label>
+    <input type="number" id="pesoInput" min="0">
+  </div>
+  
+  <!-- aquí escribe su altura por pantalla y va al input -->
+  <div>
+    <label for="alturaInput">altura (cm):</label>
+    <input type="number" id="alturaInput" min="0">
+  </div>
+  
+  <!-- aquí debe seleccionar su sexo por pantalla en el desplegable, por motivos de sencillez solo tenemos dos opciones, una opción de prefiero no responder u otro caso hubiera complicado los cálculos de calorías -->
+  <div>
+    <label for="sexoSelect">sexo:</label>
+    <select id="sexoSelect">
+      <option value="masculino">masculino</option>
+      <option value="femenino">femenino</option>
+    </select>
+  </div>
+  
+  <!-- en el desplegable de nivel de actividad física también optamos por 3 niveles ya que la mayoría de información sobre como calcular el consumo calórico usaba ese sistema -->
+  <div>
+    <label for="actividadSelect">nivel de actividad física:</label>
+    <select id="actividadSelect">
+      <option value="baja">baja</option>
+      <option value="media">media</option>
+      <option value="alta">alta</option>
+    </select>
+  </div>
+  
+  <!-- lo mismo para la selección de objetivo, si subir, mantener o bajar de peso -->
+  <div>
+    <label for="objetivoSelect">objetivo:</label>
+    <select id="objetivoSelect">
+      <option value="subir">subir</option>
+      <option value="mantener">mantener</option>
+      <option value="bajar">bajar</option>
+    </select>
+  </div>
+  
+  <!-- botón para calcular el consumo de calorías, está dentro de una clase para poder darle luego estilo en el css -->
+  <div>
+    <button class="boton-calcular" onclick="validarYCalcularConsumo()">Calcular Consumo Calórico</button>
+  </div>
+
+  <!-- div para mostrar el consumo total -->
+  <div id="consumoTotalDiv"></div>
+
+
+<script>
+  const alimentosSelect = document.getElementById('alimentosSelect'); 
+  /* aquí selecionamos los select de alimentos, el input de gramos  y el div de resultados*/
+
+    const gramosInput = document.getElementById('gramosInput'); // 
+    const resultadosDiv = document.getElementById('resultadosDiv'); // 
+    const alimentosSeleccionados = [];
+    /* y aquí inicializamos la lista para almacenar los alimentos seleccionados */
+  
+
+    /* esta es una función asincrónica (de ahí el async) para agregar un alimento  */
+    async function agregarAlimento() {
+        /* aquí obtenemos el valor seleccionado en el select de alimentos y el valor ingresado en el input de gramos, que luego lo convierte en un número */
+      const alimentoSeleccionado = alimentosSelect.value; 
+      const gramos = parseFloat(gramosInput.value); 
+
+
+      /* aquí verificamos si se ha seleccionado el alimento y si se ingresado una cantidad correcta en gramos, si el alimento seleccionado no cumple con lo indicado salta una alerta por pantalla */
+      
+      if (!alimentoSeleccionado || isNaN(gramos) || gramos <= 0) {
+        alert('Por favor, seleccione un alimento y escriba una cantidad válida en gramos.'); 
+        return; 
+      }
+
+      /* aquí realizamos las solicitudes para obtener los datos del alimento desde las diferentes rutas, calorías, macronutrientes, nivel de nutrición, sostenibilidad etc etc */
+
+      const responseCalorias = await fetch('/alimentos');
+      const dataCalorias = await responseCalorias.json();
+      const alimentoCalorias = dataCalorias.find(item => item.Alimento === alimentoSeleccionado);
+
+      const responseMacronutrientes = await fetch('/macronutrientes');
+      const dataMacronutrientes = await responseMacronutrientes.json();
+      const alimentoMacronutrientes = dataMacronutrientes.find(item => item.Alimento === alimentoSeleccionado);
+
+      const responseNutricion = await fetch('/nutricion');
+      const dataNutricion = await responseNutricion.json();
+      const alimentoNutricion = dataNutricion.find(item => item.Alimento === alimentoSeleccionado);
+
+      const responseSostenibilidad = await fetch('/sostenibilidad');
+      const dataSostenibilidad = await responseSostenibilidad.json();
+      const alimentoSostenibilidad = dataSostenibilidad.find(item => item.Alimento === alimentoSeleccionado);
+
+      const responseLugar = await fetch('/lugar');
+      const dataLugar = await responseLugar.json();
+      const alimentoLugar = dataLugar.find(item => item.Alimento === alimentoSeleccionado);
+
+      const responseMes = await fetch('/mes');
+      const dataMes = await responseMes.json();
+      const alimentoMes = dataMes.find(item => item.Alimento === alimentoSeleccionado);
+
+      const responseInfo = await fetch('/info');
+      const dataInfo = await responseInfo.json();
+      const alimentoInfo = dataInfo.find(item => item.Alimento === alimentoSeleccionado);
+
+      /* aquí verificamos si se han obtenido los resultados del alimento correctamente, calculamos las calorías, macros, grasas etc del alimento según la cantidad que el usuario indica, las tablas están calibradas a 100 gramos así que se hace una simple división por 100 y multiplicación por los gramos */ 
+      
+      if (alimentoCalorias && alimentoMacronutrientes && alimentoNutricion && alimentoSostenibilidad && alimentoLugar && alimentoMes && alimentoInfo) {
+        const calorias = (alimentoCalorias.Calorias / 100) * gramos;
+        const carbohidratos = (alimentoMacronutrientes.Carbohidratos / 100) * gramos;
+        const proteinas = (alimentoMacronutrientes.Proteinas / 100) * gramos;
+        const grasas = (alimentoMacronutrientes.Grasas / 100) * gramos;
+        const fibra = (alimentoMacronutrientes.Fibra / 100) * gramos;
+
+
+        /* ahora debemos obtener el nivel nutricional, de sostenibilidad, el lugar de producción, el mes de producción, la info y guardarlo en la lista de alimentos seleccionados */ 
+
+        const nutricion = alimentoNutricion.Nutricion;
+        const sostenibilidad = alimentoSostenibilidad.Sostenibilidad;
+        const lugar = alimentoLugar.Lugar;
+        const meses = alimentoMes.Mes;
+        const info = alimentoInfo.Info;
+        alimentosSeleccionados.push({
+          alimento: alimentoSeleccionado,
+          gramos: gramos,
+          calorias: calorias,
+          carbohidratos: carbohidratos,
+          proteinas: proteinas,
+          grasas: grasas,
+          fibra: fibra,
+          nutricion: nutricion,
+          sostenibilidad: sostenibilidad,
+          lugar: lugar,
+          meses: meses,
+          info: info
+        });
+        /* según vayamos añadiendo alimentos hay que ir sumando las calorías y macros y enseñarlo por pantalla */
+        actualizarConsumoTotal();
+        mostrarAlimentosSeleccionados();
+      }
+    }
+
+    /* aquí debemos ir actualizando el cosumo de calorías y macros y luego ir almacenando todo en un objeto llamado consumoTotal */
+    function actualizarConsumoTotal() {
+      const consumoTotal = {
+        calorias: 0,
+        carbohidratos: 0,
+        proteinas: 0,
+        grasas: 0,
+        fibra: 0
+      };
+      /* con un forEach vamos recorriendo la lista y sumando los valores y al final llamamos a la función de consumo total */
+      alimentosSeleccionados.forEach(alimento => {
+        consumoTotal.calorias += alimento.calorias;
+        consumoTotal.carbohidratos += alimento.carbohidratos;
+        consumoTotal.proteinas += alimento.proteinas;
+        consumoTotal.grasas += alimento.grasas;
+        consumoTotal.fibra += alimento.fibra;
+      });
+      mostrarConsumoTotal(consumoTotal);
+    }
+
+
+    /* esta es la función para mostrar el consumo total de calorías y macros, con el getElementById obtenemos el div donde se mostrará el consumo y al final vamos actualizando el consumo */
+   
+    function mostrarConsumoTotal(consumoTotal) {
+      const consumoTotalDiv = document.getElementById('consumoTotalDiv');
+      consumoTotalDiv.innerHTML = `
+        <h2>Tu consumo total es:</h2>
+        <ul>
+          <li>${consumoTotal.calorias.toFixed(2)} calorías</li>
+          <li>${consumoTotal.carbohidratos.toFixed(2)} gramos de carbohidratos</li>
+          <li>${consumoTotal.proteinas.toFixed(2)} gramos de proteínas</li>
+          <li>${consumoTotal.grasas.toFixed(2)} gramos de grasas</li>
+          <li>${consumoTotal.fibra.toFixed(2)} gramos de fibra</li>
+        </ul>
+      `;
+    }
+
+    /* esta es la función para enseñar por pantalla los alimentos seleccionados y sus detalles, va iterando con un foreach sobre cada elemento y creando un div para mostrar los detalles, al principio tenemos un img src para que aparezcan las imágenes, luego los iconos de cada dato con su correspondiente info, con el tofixed(2) nos aaseguramos que solo salgan dos dígitos después de la coma */
+
+function mostrarAlimentosSeleccionados() {
+  resultadosDiv.innerHTML = '';
+  alimentosSeleccionados.forEach((alimento, index) => {
+    const resultado = document.createElement('div');
+    resultado.innerHTML = `
+      <h2>${index + 1}. ${alimento.alimento} - ${alimento.gramos} gramos</h2>
+      <img src="/fotos/${alimento.alimento}.jpeg" alt="${alimento.alimento}" class="imagen-grande">
+      <ul>
+        <li><img src="/iconos/calorías.jpeg" alt="Icono de calorías" class="icono-pequeno"> <span>${alimento.calorias.toFixed(2)} calorías</span></li>
+        <li><img src="/iconos/carbohidratos.jpeg" alt="Icono de carbohidratos" class="icono-pequeno"> <span>${alimento.carbohidratos.toFixed(2)} gramos de carbohidratos</span></li>
+        <li><img src="/iconos/proteínas.jpeg" alt="Icono de proteínas" class="icono-pequeno"> <span>${alimento.proteinas.toFixed(2)} gramos de proteínas</span></li>
+        <li><img src="/iconos/grasas.jpeg" alt="Icono de grasas" class="icono-pequeno"> <span>${alimento.grasas.toFixed(2)} gramos de grasas</span></li>
+        <li><img src="/iconos/fibra.jpeg" alt="Icono de fibra" class="icono-pequeno"> <span>${alimento.fibra.toFixed(2)} gramos de fibra</span></li>
+        <li><img src="/iconos/nutrición.jpeg" alt="Icono de nutrición" class="icono-pequeno"> <span>Nivel nutricional (del 1 al 5 siendo 1 el menor): ${alimento.nutricion}</span></li>
+        <li><img src="/iconos/sostenibilidad.jpeg" alt="Icono de sostenibilidad" class="icono-pequeno"> <span>Nivel de sostenibilidad (del 1 al 5 siendo 1 el menor): ${alimento.sostenibilidad}</span></li>
+        <li><img src="/iconos/lugar.jpeg" alt="Icono de lugar" class="icono-pequeno"> <span>Lugar de producción: ${alimento.lugar}</span></li>
+        <li><img src="/iconos/mes.jpeg" alt="Icono de mes" class="icono-pequeno"> <span>Meses de producción: ${alimento.meses}</span></li>
+        <li><img src="/iconos/info.jpeg" alt="Icono de información" class="icono-pequeno"> <span>Información adicional: ${alimento.info}</span></li>
+      </ul>
+      <button class="boton-eliminar" onclick="eliminarAlimento(${index})">Eliminar alimento</button>
+    `;
+    /* con el appendChild agregamos el elemento div al div de resultados */
+    resultadosDiv.appendChild(resultado);
+  });
+}
+
+/* esta es la función paraeliminar un alimento de la lista, usamos splice, que eliminará alimentos del index, 1 en (index, 1) significa que solo eliminará un alimento a partir de la posición especificada en el index, luego actualizamos para que no aparezca el alimento por pantalla y actualizamos el contador de calorías y macros */
+
+function eliminarAlimento(index) {
+  alimentosSeleccionados.splice(index, 1);
+  mostrarAlimentosSeleccionados();
+  actualizarConsumoTotal();
+}
+
+
+
+// aquí validmos que los datos sean correctos y si no salta un mensaje por pantalla
+function validarYCalcularConsumo() {
+    const edadInput = document.getElementById('edadInput');
+    const pesoInput = document.getElementById('pesoInput');
+    const alturaInput = document.getElementById('alturaInput');
+
+    if (parseFloat(edadInput.value) < 0 || parseFloat(pesoInput.value) < 0 || parseFloat(alturaInput.value) < 0 ||
+        isNaN(parseFloat(edadInput.value)) || isNaN(parseFloat(pesoInput.value)) || isNaN(parseFloat(alturaInput.value))) {
+      alert('Por favor, introduzca valores numéricos positivos válidos en todos los campos.');
+      return;
+    }
+
+    calcularConsumo();
+  }
+/* esta es la función para calcular el consumo calórico del usuario, se usa la fórmula Harris-Benedict, primero obetenenos los datos y para unos mejore resultados añadimos el nivel de actividad de la persona, con toda esa información calculamos con consumo calórico recomendado */ 
+
+function calcularConsumo() {
+  const edad = parseInt(document.getElementById('edadInput').value);
+  const peso = parseFloat(document.getElementById('pesoInput').value);
+  const altura = parseInt(document.getElementById('alturaInput').value);
+  const sexo = document.getElementById('sexoSelect').value;
+  const actividad = document.getElementById('actividadSelect').value;
+  const objetivo = document.getElementById('objetivoSelect').value;
+
+  let tmb;
+  if (sexo === 'masculino') {
+    tmb = 10 * peso + 6.25 * altura - 5 * edad + 5;
+  } else {
+    tmb = 10 * peso + 6.25 * altura - 5 * edad - 161;
+  }
+
+  let factorActividad;
+  if (actividad === 'baja') {
+    factorActividad = 1.2;
+  } else if (actividad === 'media') {
+    factorActividad = 1.55;
+  } else {
+    factorActividad = 1.9;
+  }
+
+  let consumoRecomendado;
+  if (objetivo === 'subir') {
+    consumoRecomendado = tmb * factorActividad + 500;
+  } else if (objetivo === 'mantener') {
+    consumoRecomendado = tmb * factorActividad;
+  } else {
+    consumoRecomendado = tmb * factorActividad - 500;
+  }
+
+  /* calculamos el consumo total sumando los valores de cada alimento seleccionado */ 
+const consumoTotalDiv = document.getElementById('consumoTotalDiv');
+const consumoTotal = alimentosSeleccionados.reduce((acumulador, alimento) => {
+  acumulador.calorias += alimento.calorias;
+  acumulador.carbohidratos += alimento.carbohidratos;
+  acumulador.proteinas += alimento.proteinas;
+  acumulador.grasas += alimento.grasas;
+  acumulador.fibra += alimento.fibra;
+  return acumulador;
+}, { calorias: 0, carbohidratos: 0, proteinas: 0, grasas: 0, fibra: 0 });
+
+
+/* enseñamos por pantalla el consumo total y el aviso de consumo recomendado de calorías */
+
+consumoTotalDiv.innerHTML = `
+  <h2>Tu consumo total es:</h2>
+  <ul>
+    <li>${consumoTotal.calorias.toFixed(2)} calorías</li>
+    <li>${consumoTotal.carbohidratos.toFixed(2)} gramos de carbohidratos</li>
+    <li>${consumoTotal.proteinas.toFixed(2)} gramos de proteínas</li>
+    <li>${consumoTotal.grasas.toFixed(2)} gramos de grasas</li>
+    <li>${consumoTotal.fibra.toFixed(2)} gramos de fibra</li>
+  </ul>
+  <h2>Deberías consumir ${consumoRecomendado.toFixed(2)} calorías para estar dentro de tu objetivo.</h2>
+`;
+}
+
+
+/* aquí cargamos la lista de alimentos al cargar la página, obtenemos la lista mediante un fetch al servidor, lo convertimos a json, iteramos con un foreach sobre cada elemento y creamos una opción sobre cada elemento */
+window.onload = async function() {
+  const response = await fetch('/alimentos');
+  const data = await response.json();
+  data.forEach(item => {
+    const option = document.createElement('option');
+    option.value = item.Alimento;
+    option.textContent = item.Alimento;
+    alimentosSelect.appendChild(option);
+  });
+};
+
+ </script>
+</body>
+</html>

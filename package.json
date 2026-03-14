@@ -1,0 +1,17 @@
+{
+  "name": "openshift-sustainable-project",
+  "version": "1.0.0",
+  "description": "Sustainable food app deployed on OpenShift",
+  "main": "controller/server.js",
+  "scripts": {
+    "start": "node controller/server.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.19.2",
+    "mysql": "^2.18.1",
+    "mysql2": "^3.6.0"
+  }
+}
