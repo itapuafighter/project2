@@ -88,6 +88,10 @@ app.get('/foto/:alimento', (req, res) => {
   res.sendFile(path.join(__dirname, '..', 'fotos', `${alimento}.jpeg`));
 });
 
+app.get('/health', (req, res) => {
+  res.status(200).json({ status: 'ok' });
+});
+
 app.listen(port, () => {
   console.log(`Servidor Express iniciado en el puerto ${port}`);
 });
